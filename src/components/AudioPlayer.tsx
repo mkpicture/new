@@ -86,7 +86,7 @@ const AudioPlayer = ({ src, title, autoPlay = false, onEnded }: AudioPlayerProps
 
   return (
     <div className="glass-card rounded-xl p-6 w-full max-w-md mx-auto">
-      <audio ref={audioRef} src={src} preload="metadata" />
+      <audio ref={audioRef} src={src} preload="auto" />
       
       {title && (
         <p className="text-sm text-muted-foreground mb-4 text-center font-display tracking-wide">

@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -178,8 +178,10 @@ const Game = () => {
   const [message, setMessage] = useState<{ type: 'error' | 'hint' | 'success'; text: string } | null>(null);
   const [isShaking, setIsShaking] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [currentAudio, setCurrentAudio] = useState<string>(encodeURI('/Messages audios/Intro code.m4a'));
   const [currentPerson, setCurrentPerson] = useState<PersonEntry | null>(null);
+  const preloadedAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 300);
@@ -212,18 +214,42 @@ const Game = () => {
       return normalizeString(p.code) === '';
     });
 
+    // Nettoyer l'audio préchargé précédent
+    if (preloadedAudioRef.current) {
+      preloadedAudioRef.current.pause();
+      preloadedAudioRef.current.src = '';
+      preloadedAudioRef.current.load();
+    }
+
     if (person) {
       setCurrentPerson(person);
       if (person.audio) {
         setCurrentAudio(person.audio);
+        // Précharger l'audio pour un chargement plus rapide
+        const audio = new Audio(person.audio);
+        audio.preload = 'auto';
+        audio.load();
+        preloadedAudioRef.current = audio;
       } else {
         // Si la personne existe mais n'a pas d'audio, utiliser l'audio par défaut
         setCurrentAudio(encodeURI('/Messages audios/Intro code.m4a'));
+        preloadedAudioRef.current = null;
       }
     } else {
       setCurrentPerson(null);
       setCurrentAudio(encodeURI('/Messages audios/Intro code.m4a'));
+      preloadedAudioRef.current = null;
     }
+
+    // Nettoyer à la fin
+    return () => {
+      if (preloadedAudioRef.current) {
+        preloadedAudioRef.current.pause();
+        preloadedAudioRef.current.src = '';
+        preloadedAudioRef.current.load();
+        preloadedAudioRef.current = null;
+      }
+    };
   }, [name, code]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -255,7 +281,10 @@ const Game = () => {
         return normalizeString(p.code) === '';
       });
 
+      // Activer l'animation de succès
+      setIsSuccess(true);
       setMessage({ type: 'success', text: 'Le voile se lève...' });
+      
       setTimeout(() => {
         navigate('/revelation', { 
           state: { 
@@ -263,7 +292,7 @@ const Game = () => {
             audioUrl: foundPerson?.audio || encodeURI('/Messages audios/Intro code.m4a')
           } 
         });
-      }, 1500);
+      }, 2000);
     } else {
       setAttempts((prev) => prev + 1);
       setIsShaking(true);
@@ -363,12 +392,36 @@ const Game = () => {
 
             {/* Message display */}
             {message && (
-              <div className={`animate-fade-in p-4 rounded-lg text-center ${
+              <div className={`animate-fade-in p-4 rounded-lg text-center relative ${
                 message.type === 'error' ? 'bg-destructive/10 border border-destructive/30 text-destructive' :
-                message.type === 'success' ? 'bg-gold/10 border border-gold/30 text-gold glow-gold' :
+                message.type === 'success' ? `bg-gold/10 border border-gold/30 text-gold glow-gold ${isSuccess ? 'animate-pulse scale-110' : ''}` :
                 'bg-muted border border-border text-muted-foreground'
               }`}>
                 <p className="text-sm font-display">{message.text}</p>
+              </div>
+            )}
+
+            {/* Animation de célébration */}
+            {isSuccess && (
+              <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+                {/* Confettis */}
+                {[...Array(50)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-3 h-3 rounded-full animate-celebration"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      backgroundColor: i % 3 === 0 ? '#FFD700' : i % 3 === 1 ? '#FF6B6B' : '#4ECDC4',
+                      animationDelay: `${Math.random() * 0.5}s`,
+                      animationDuration: `${1 + Math.random() * 1}s`,
+                      transform: `rotate(${Math.random() * 360}deg)`,
+                    }}
+                  />
+                ))}
+                {/* Rayons de lumière */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gold/20 rounded-full animate-ping" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gold/30 rounded-full animate-pulse" />
               </div>
             )}
 
@@ -402,12 +455,25 @@ const Game = () => {
         </div>
       </main>
 
-      {/* Custom shake animation */}
+      {/* Custom animations */}
       <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
           20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        @keyframes celebration {
+          0% {
+            transform: translateY(0) rotate(0deg) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100vh) rotate(720deg) scale(0);
+            opacity: 0;
+          }
+        }
+        .animate-celebration {
+          animation: celebration 2s ease-out forwards;
         }
       `}</style>
     </div>
