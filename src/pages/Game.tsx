@@ -350,11 +350,26 @@ const Game = () => {
           </div>
 
           {/* Audio Player */}
-          <div className="animate-fade-in delay-300">
+          <div className={`animate-fade-in delay-300 relative ${isSuccess ? 'animate-pulse-glow scale-105' : ''} transition-all duration-500`}>
             <AudioPlayer
               src={currentAudio}
               title={currentPerson ? `🎵 Message pour ${currentPerson.name}` : "🎵 Écoute attentivement..."}
             />
+            {/* Animation de chargement du message */}
+            {isSuccess && currentPerson && (
+              <div className="absolute -inset-2 flex items-center justify-center pointer-events-none z-10">
+                <div className="glass-card rounded-xl p-4 border-2 border-gold/60 glow-gold animate-pulse shadow-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="w-8 h-8 border-4 border-gold/30 border-t-gold rounded-full animate-spin"></div>
+                    </div>
+                    <p className="text-gold font-display text-sm font-semibold">
+                      Chargement du message pour {currentPerson.name}...
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Hint System */}

@@ -2,11 +2,32 @@
   <defs>
     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" />
     </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:0" />
+    </radialGradient>
   </defs>
-  <circle cx="50" cy="50" r="45" fill="url(#grad)" />
-  <path d="M 30 50 L 45 35 L 45 45 L 70 45 L 70 55 L 45 55 L 45 65 Z" fill="#1a1a2e" />
-  <circle cx="50" cy="30" r="5" fill="#FFD700" />
+  <!-- Cercle de fond avec gradient -->
+  <circle cx="50" cy="50" r="48" fill="url(#grad)" />
+  <!-- Effet de lueur -->
+  <circle cx="50" cy="50" r="45" fill="url(#glow)" opacity="0.6" />
+  <!-- Symbole de clé/secret -->
+  <g transform="translate(50, 50)">
+    <!-- Tige de la clé -->
+    <rect x="-3" y="-25" width="6" height="30" rx="3" fill="#1a1a2e" />
+    <!-- Anneau de la clé -->
+    <circle cx="0" cy="-30" r="8" fill="none" stroke="#1a1a2e" stroke-width="3" />
+    <!-- Dents de la clé -->
+    <rect x="-8" y="-5" width="16" height="4" rx="2" fill="#1a1a2e" />
+    <rect x="-4" y="-1" width="8" height="4" rx="2" fill="#1a1a2e" />
+    <rect x="-2" y="3" width="4" height="4" rx="2" fill="#1a1a2e" />
+  </g>
+  <!-- Étoiles décoratives -->
+  <circle cx="25" cy="25" r="2" fill="#FFD700" opacity="0.8" />
+  <circle cx="75" cy="25" r="2" fill="#FFD700" opacity="0.8" />
+  <circle cx="25" cy="75" r="2" fill="#FFD700" opacity="0.8" />
+  <circle cx="75" cy="75" r="2" fill="#FFD700" opacity="0.8" />
 </svg>
-
