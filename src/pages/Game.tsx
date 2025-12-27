@@ -182,11 +182,23 @@ const Game = () => {
   const [currentAudio, setCurrentAudio] = useState<string>(encodeURI('/Messages audios/Intro code.m4a'));
   const [currentPerson, setCurrentPerson] = useState<PersonEntry | null>(null);
   const preloadedAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [shouldAutoPlayIntro, setShouldAutoPlayIntro] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 300);
     return () => clearTimeout(timer);
   }, []);
+
+  // Désactiver l'autoplay après le premier chargement
+  useEffect(() => {
+    if (shouldAutoPlayIntro) {
+      // Désactiver après un court délai pour permettre l'autoplay
+      const timer = setTimeout(() => {
+        setShouldAutoPlayIntro(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldAutoPlayIntro]);
 
   // Mettre à jour l'audio quand le prénom ou le code change
   useEffect(() => {
@@ -354,6 +366,7 @@ const Game = () => {
             <AudioPlayer
               src={currentAudio}
               title={currentPerson ? `🎵 Message pour ${currentPerson.name}` : "🎵 Écoute attentivement..."}
+              autoPlay={!currentPerson && shouldAutoPlayIntro}
             />
             {/* Animation de chargement du message */}
             {isSuccess && currentPerson && (
