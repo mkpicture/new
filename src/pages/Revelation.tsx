@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import ParticleBackground from '@/components/ParticleBackground';
+import AudioPlayer from '@/components/AudioPlayer';
 import { Heart, RotateCcw } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Revelation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [stage, setStage] = useState(0);
+  const personName = (location.state as { personName?: string })?.personName || 'Cher(e) joueur(se)';
+  const audioUrl = (location.state as { audioUrl?: string })?.audioUrl || encodeURI('/Messages audios/Intro code.m4a');
 
   useEffect(() => {
     // Progressive reveal stages
@@ -47,7 +51,7 @@ const Revelation = () => {
           {/* Main title */}
           <div className={`transition-all duration-1000 delay-500 ${stage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <h1 className="font-display text-5xl md:text-7xl font-light text-gradient-gold animate-text-reveal">
-              Bravo
+              Bravo {personName} !
             </h1>
           </div>
 
@@ -59,12 +63,23 @@ const Revelation = () => {
           {/* Revelation message */}
           <div className={`space-y-6 transition-all duration-1000 ${stage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <p className="text-xl md:text-2xl text-foreground font-display font-light leading-relaxed">
-              Tu as trouvé le secret.
+              Tu as trouvé le secret, {personName} !
             </p>
             <p className="text-lg text-foreground/80 font-light leading-relaxed">
               Derrière chaque énigme se cache une vérité,<br />
               et cette vérité t'était destinée.
             </p>
+          </div>
+
+          {/* Audio Player for the personal message */}
+          <div className={`transition-all duration-1000 ${stage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="max-w-md mx-auto">
+              <AudioPlayer
+                src={audioUrl}
+                title={`🎵 Message audio pour ${personName}`}
+                autoPlay={stage >= 4}
+              />
+            </div>
           </div>
 
           {/* Personal message box */}

@@ -245,8 +245,25 @@ const Game = () => {
     }
 
     if (isValidCombination(normalizedName, normalizedCode)) {
+      // Trouver la personne correspondante pour passer ses informations
+      const foundPerson = PEOPLE.find(p => {
+        const normalizedPersonName = normalizeString(p.name);
+        if (normalizedPersonName !== normalizedName) return false;
+        if (normalizedCode) {
+          return codeMatches(normalizedCode, p.code);
+        }
+        return normalizeString(p.code) === '';
+      });
+
       setMessage({ type: 'success', text: 'Le voile se lève...' });
-      setTimeout(() => navigate('/revelation'), 1500);
+      setTimeout(() => {
+        navigate('/revelation', { 
+          state: { 
+            personName: foundPerson?.name || name,
+            audioUrl: foundPerson?.audio || encodeURI('/Messages audios/Intro code.m4a')
+          } 
+        });
+      }, 1500);
     } else {
       setAttempts((prev) => prev + 1);
       setIsShaking(true);
